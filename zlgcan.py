@@ -20,6 +20,27 @@ import platform
 DEVICE_HANDLE  = c_void_p
 CHANNEL_HANDLE = c_void_p
 CANID          = c_uint
+ZCAN_STATUS    = c_uint
+ZCAN_DEVICE_TYPE = c_uint
+
+ZCAN_PCI5121        = ZCAN_DEVICE_TYPE(1)
+ZCAN_PCI9810        = ZCAN_DEVICE_TYPE(2)
+ZCAN_USBCAN1        = ZCAN_DEVICE_TYPE(3)
+ZCAN_USBCAN2        = ZCAN_DEVICE_TYPE(4)
+ZCAN_PCI9820        = ZCAN_DEVICE_TYPE(5)
+
+ZCAN_USBCANFD_200U  = ZCAN_DEVICE_TYPE(41)
+ZCAN_USBCANFD_100U  = ZCAN_DEVICE_TYPE(42)
+ZCAN_USBCANFD_MINI  = ZCAN_DEVICE_TYPE(43)
+
+ZCAN_STATUS_ERR         = ZCAN_STATUS(0)
+ZCAN_STATUS_OK          = ZCAN_STATUS(1)
+ZCAN_STATUS_ONLINE      = ZCAN_STATUS(2)
+ZCAN_STATUS_OFFLINE     = ZCAN_STATUS(3)
+ZCAN_STATUS_UNSUPPORTED = ZCAN_STATUS(4)
+
+ZCAN_TYPE_CAN           = c_ubyte(0)
+ZCAN_TYPE_CANFD         = c_ubyte(1)
 
 class ZCAN_DEVICE_INFO(Structure):
     _fields_ = [("hw_Version", c_ushort),
@@ -143,7 +164,7 @@ class ZCAN(object):
         try:
             info = ZCAN_DEVICE_INFO()
             ret = self.__m_dll.ZCAN_GetDeviceInf(device_handle, info)
-            return info
+            return ZCAN_STATUS(ret), info
         except:
             print("Exception on ZCAN_GetDeviceInf")
             raise
@@ -151,7 +172,7 @@ class ZCAN(object):
     def DeviceOnLine(device_handle):
         try:
             ret = self.__m_dll.ZCAN_IsDeviceOnLine(device_handle)
-            return c_uint(ret)
+            return ZCAN_STATUS(ret)
         except:
             print("Exception on ZCAN_ZCAN_IsDeviceOnLine!")
             raise
@@ -175,7 +196,7 @@ class ZCAN(object):
     def ResetCAN(chn_handle):
         try:
             ret = self.__m_dll.ZCAN_ResetCAN(chn_handle)
-            return c_uint(ret)
+            return ZCAN_STATUS(ret)
         except:
             print("Exception on ZCAN_ResetCAN!")
             raise
@@ -183,37 +204,70 @@ class ZCAN(object):
     def ClearBuffer(chn_handle):
         try:
             ret = self.__m_dll.ZCAN_ClearBuffer(chn_handle)
-            return c_uint(ret)
+            return ZCAN_STATUS(ret)
         except:
             print("Exception on ZCAN_ClearBuffer!")
             raise
 
     def ReadChannelErrInfo(chn_handle):
         try:
-            ErrInfo = ZCAN_
-            ret = self.__m_dll.ZCAN_ClearBuffer(chn_handle)
-            return c_uint(ret)
+            ErrInfo = ZCAN_CHANNEL_ERR_INFO()
+            ret = self.__m_dll.ZCAN_ReadChannelErrInfo(chn_handle)
+            return ZCAN_STATUS(ret), ErrInfo
         except:
-            print("Exception on ZCAN_ClearBuffer!")
+            print("Exception on ZCAN_ReadChannelErrInfo!")
             raise
 
     def ReadChannelStatus(chn_handle):
-        return None
+        try:
+            status = ZCAN_CHANNEL_STATUS()
+            ret = self.__m_dll.ZCAN_ReadChannelStatus(chn_handle, byref(status))
+            return ZCAN_STATUS(ret), status 
+        except:
+            print("Exception on ZCAN_ReadChannelStatus!")
+            raise
 
-    def GetReceiveNum(chn_handle, type = 0):
-        return 0
+    def GetReceiveNum(chn_handle, can_type = ZCAN_TYPE_CAN):
+        try:
+            ret = self.__m_dll.ZCAN_GetReceiveNum(chn_handle, can_type)
+            return c_uint(ret)
+        except:
+            print("Exception on ZCAN_GetReceiveNum!")
+            raise
 
     def Transmit(chn_handle, std_msg, len):
-        pass
+        try:
+            ret = self.__m_dll.ZCAN_Transmit(chn_handle, byref(std_msg), len)
+            return ZCAN_STATUS(ret)
+        except:
+            print("Exception on ZCAN_Transmit!")
+            raise
 
-    def Receive(chn_handle, wait_time = -1):
-        pass
+    def Receive(chn_handle, rcv_num, wait_time = c_int(-1)):
+        try:
+            rcv_can_msgs = ZCAN_Receive_Data() * rcv_num
+            ret = self.__m_dll.ZCAN_Receive(chn_handle, byref(rcv_can_msgs), rcv_num, wait_time)
+            return rcv_can_msgs, ret
+        except:
+            print("Exception on ZCAN_Receive!")
+            raise
     
     def TransmitFD(chn_handle, fd_msg, len):
-        pass
+        try:
+            ret = self.__m_dll.ZCAN_TransmitFD(chn_handle, byref(fd_msg), len)
+            return ZCAN_STATUS(ret)
+        except:
+            print("Exception on ZCAN_TransmitFD!")
+            raise
     
-    def ReceiveFD(chn_handle, wait_time = -1):
-        pass
+    def ReceiveFD(chn_handle, rcv_num, wait_time = c_int(-1)):
+        try:
+            rcv_canfd_msgs = ZCAN_ReceiveFD_Data() * rcv_num
+            ret = self.__m_dll.ZCAN_Receive(chn_handle, byref(rcv_can_msgs), rcv_num, wait_time)
+            return rcv_canfd_msgs, ret
+        except:
+            print("Exception on ZCAN_ReceiveFD!")
+            raise
 
     #reserved 
     def GetIProperty(device_handle):
