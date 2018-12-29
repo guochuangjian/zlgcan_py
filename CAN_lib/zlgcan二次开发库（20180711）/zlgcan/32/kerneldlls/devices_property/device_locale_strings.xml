@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sentences>
+<sentence>
+    <from>baud_rate</from>
+    <to>
+        <en>Baud Rate</en>
+        <zh>波特率</zh>
+        <default>baud_rate</default>
+    </to>
+</sentence>
+
+<sentence>
+    <from>program</from>
+    <to>
+        <en>Program</en>
+        <zh>程序</zh>
+        <default>program</default>
+    </to>
+</sentence>
+
+<sentence>
+  <from>acc_code</from>
+  <to>
+    <en>acc_code</en>
+    <zh>验收码</zh>
+    <default>acc_code</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>acc_mask</from>
+  <to>
+    <en>acc_mask</en>
+    <zh>屏蔽码</zh>
+    <default>acc_mask</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>internal_resistance</from>
+  <to>
+    <en>internal_resistance</en>
+    <zh>内置120欧电阻</zh>
+    <default>internal_resistance</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>work_mode</from>
+  <to>
+    <en>work_mode</en>
+    <zh>工作模式</zh>
+    <default>work_mode</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>local_port</from>
+  <to>
+    <en>local_port</en>
+    <zh>本地端口</zh>
+    <default>local_port</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>ip</from>
+  <to>
+    <en>ip</en>
+    <zh>ip地址</zh>
+    <default>ip</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>work_port</from>
+  <to>
+    <en>work_port</en>
+    <zh>工作端口</zh>
+    <default>work_port</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>baud_rate_reg</from>
+  <to>
+    <en>baud_rate_reg</en>
+    <zh>波特率寄存器值</zh>
+    <default>baud_rate_reg</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>filter_mode</from>
+  <to>
+    <en>filter_mode</en>
+    <zh>滤波模式</zh>
+    <default>filter_mode</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>filter_start</from>
+  <to>
+    <en>filter_start</en>
+    <zh>滤波起始帧</zh>
+    <default>filter_start</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>filter_end</from>
+  <to>
+    <en>filter_end</en>
+    <zh>滤波结束帧</zh>
+    <default>filter_end</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>canfd_enable</from>
+  <to>
+    <en>canfd_enable</en>
+    <zh>canfd使能</zh>
+    <default>canfd_enable</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>drp_div</from>
+  <to>
+    <en>drp_div</en>
+    <zh>波特率预分频因子</zh>
+    <default>drp_div</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>canfd_abit_baud_rate</from>
+  <to>
+    <en>canfd_abit_baud_rate</en>
+    <zh>仲裁域波特率</zh>
+    <default>canfd_abit_baud_rate</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>canfd_timing0</from>
+  <to>
+    <en>canfd_timing0</en>
+    <zh>定时器0</zh>
+    <default>canfd_timing0</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>canfd_dbit_baud_rate</from>
+  <to>
+    <en>canfd_dbit_baud_rate</en>
+    <zh>数据域波特率</zh>
+    <default>canfd_dbit_baud_rate</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>canfd_timing1</from>
+  <to>
+    <en>canfd_timing1</en>
+    <zh>定时器1</zh>
+    <default>canfd_timing1</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>can_baud_rate</from>
+  <to>
+    <en>can_baud_rate</en>
+    <zh>波特率</zh>
+    <default>can_baud_rate</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>can_timing0</from>
+  <to>
+    <en>can_timing0</en>
+    <zh>定时器0</zh>
+    <default>can_timing0</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>can_timing1</from>
+  <to>
+    <en>can_timing1</en>
+    <zh>定时器1</zh>
+    <default>can_timing1</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>send_type</from>
+  <to>
+    <en>send_type</en>
+    <zh>发送类型</zh>
+    <default>send_type</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>filter</from>
+  <to>
+    <en>filter</en>
+    <zh>滤波方式</zh>
+    <default>filter</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>retry</from>
+  <to>
+    <en>retry</en>
+    <zh>发送失败后重发次数</zh>
+    <default>retry</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>timing0</from>
+  <to>
+    <en>timing0</en>
+    <zh>定时器0</zh>
+    <default>timing0</default>
+  </to>
+</sentence>
+
+<sentence>
+  <from>timing1</from>
+  <to>
+    <en>timing1</en>
+    <zh>定时器1</zh>
+    <default>timing1</default>
+  </to>
+</sentence>
+
+<sentence>
+ <from>double_filter</from>
+  <to>
+   <en>double_filter</en>
+   <zh>双滤波</zh>
+   <default>double_filter</default>
+ </to>
+</sentence>
+  
+  <sentence>
+    <from>single_filter</from>
+    <to>
+      <en>single_filter</en>
+      <zh>单滤波</zh>
+      <default>single_filter</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>normal_mode</from>
+    <to>
+      <en>normal_mode</en>
+      <zh>正常模式</zh>
+      <default>normal_mode</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>readonly_mode</from>
+    <to>
+      <en>readonly_mode</en>
+      <zh>只听模式</zh>
+      <default>readonly_mode</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>filter_standard</from>
+    <to>
+      <en>filter_standard</en>
+      <zh>标准帧滤波</zh>
+      <default>filter_standard</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>filter_extend</from>
+    <to>
+      <en>filter_extend</en>
+      <zh>扩展帧滤波</zh>
+      <default>filter_extend</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>filter_disable</from>
+    <to>
+      <en>filter_disable</en>
+      <zh>禁能滤波</zh>
+      <default>filter_disable</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>redirect_enable</from>
+    <to>
+      <en>redirect_enable</en>
+      <zh>转发</zh>
+      <default>redirect_enable</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>redirect_disable</from>
+    <to>
+      <en>redirect_disable</en>
+      <zh>不转发</zh>
+      <default>redirect_disable</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>self_mode</from>
+    <to>
+      <en>self_mode</en>
+      <zh>自发自收模式</zh>
+      <default>self_mode</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>enable</from>
+    <to>
+      <en>enable</en>
+      <zh>使能</zh>
+      <default>enable</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>disable</from>
+    <to>
+      <en>disable</en>
+      <zh>禁能</zh>
+      <default>disable</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>use</from>
+    <to>
+      <en>use</en>
+      <zh>使用</zh>
+      <default>use</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>no</from>
+    <to>
+      <en>no</en>
+      <zh>不使用</zh>
+      <default>no</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>canfd_standard</from>
+    <to>
+      <en>CANFD standard</en>
+      <zh>CANFD标准</zh>
+      <default>CANFD standard</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>clock</from>
+    <to>
+      <en>clock</en>
+      <zh>晶振频率</zh>
+      <default>clock</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>initenal_resistance</from>
+    <to>
+      <en>initenal resistance</en>
+      <zh>终端电阻</zh>
+      <default>initenal resistance</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>baud_rate_custom</from>
+    <to>
+      <en>custom baud_rate</en>
+      <zh>自定义波特率</zh>
+      <default>custom baud_rate</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>custom</from>
+    <to>
+      <en>custom</en>
+      <zh>自定义</zh>
+      <default>custom</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>protocol</from>
+    <to>
+      <en>protocol</en>
+      <zh>协议</zh>
+      <default>protocol</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>canfd_exp</from>
+    <to>
+      <en>canfd_exp</en>
+      <zh>CANFD加速</zh>
+      <default>canfd_exp</default>
+    </to>
+  </sentence>
+  <sentence>
+    <from>confirm</from>
+    <to>
+      <en>confirm</en>
+      <zh>确认</zh>
+      <default>confirm</default>
+    </to>
+  </sentence>
+</sentences>
