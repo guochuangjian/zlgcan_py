@@ -288,3 +288,4 @@ if __name__ == "__main__":
     ret = zcanlib.DeviceOnLine(handle)
     print(ret)
     zcanlib.CloseDevice(handle)
+
