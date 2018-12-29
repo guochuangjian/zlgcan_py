@@ -142,7 +142,7 @@ class ZCAN(object):
             self.__m_dll = windll.LoadLibrary("zlgcan.dll")
         else:
             print("No support now!")
-        if self.__m_dll == None
+        if self.__m_dll == None:
             print("DLL couldn't be loaded!")
 
     def OpenDevice(self, device_type, device_index, reserved):
