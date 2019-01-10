@@ -134,16 +134,16 @@ class ZCAN_CANFD_FRAME(Structure):
                 ("data",    c_ubyte * 64)]
 
 class ZCAN_Transmit_Data(Structure):
-    _fileds_ = [("frame", ZCAN_CAN_FRAME), ("transmit_type", c_uint)]
+    _fields_ = [("frame", ZCAN_CAN_FRAME), ("transmit_type", c_uint)]
 
 class ZCAN_Receive_Data(Structure):
-    _fileds_ = [("frame", ZCAN_CAN_FRAME), ("timestamp", c_ulong)]
+    _fields_  = [("frame", ZCAN_CAN_FRAME), ("timestamp", c_ulonglong)]
 
 class ZCAN_TransmitFD_Data(Structure):
-    _fileds_ = [("frame", ZCAN_CANFD_FRAME), ("transmit_type", c_uint)]
+    _fields_ = [("frame", ZCAN_CANFD_FRAME), ("transmit_type", c_uint)]
 
 class ZCAN_ReceiveFD_Data(Structure):
-    _fileds_ = [("frame", ZCAN_CANFD_FRAME), ("timestamp", c_ulong)]
+    _fields_ = [("frame", ZCAN_CANFD_FRAME), ("timestamp", c_ulonglong)]
 
 class ZCAN_AUTO_TRANSMIT_OBJ(Structure):
     _fields_ = [("enable",   c_ushort),
@@ -156,6 +156,11 @@ class ZCANFD_AUTO_TRANSMIT_OBJ(Structure):
                 ("index",    c_ushort),
                 ("interval", c_uint),
                 ("obj",      ZCAN_TransmitFD_Data)]
+
+class IProperty(Structure):
+    _fields_ = [("SetValue", c_void_p), 
+                ("GetValue", c_void_p),
+                ("GetPropertys", c_void_p)]
 
 class ZCAN(object):
     def __init__(self):
@@ -199,8 +204,8 @@ class ZCAN(object):
 
     def InitCAN(self, device_handle, can_index, init_config):
         try:
-            ret = self.__m_dll.ZCAN_InitCAN(device_handle, can_index, byref(init_config))
-            return CHANNEL_HANDLE(ret)
+            return self.__m_dll.ZCAN_InitCAN(device_handle, can_index, byref(init_config))
+            # return CHANNEL_HANDLE(ret)
         except:
             print("Exception on ZCAN_InitCAN!")
             raise
@@ -229,7 +234,7 @@ class ZCAN(object):
     def ReadChannelErrInfo(self, chn_handle):
         try:
             ErrInfo = ZCAN_CHANNEL_ERR_INFO()
-            ret = self.__m_dll.ZCAN_ReadChannelErrInfo(chn_handle)
+            ret = self.__m_dll.ZCAN_ReadChannelErrInfo(chn_handle, byref(ErrInfo))
             return ErrInfo if ret == ZCAN_STATUS_OK else None
         except:
             print("Exception on ZCAN_ReadChannelErrInfo!")
@@ -260,8 +265,8 @@ class ZCAN(object):
 
     def Receive(self, chn_handle, rcv_num, wait_time = c_int(-1)):
         try:
-            rcv_can_msgs = ZCAN_Receive_Data() * rcv_num
-            ret = self.__m_dll.ZCAN_Receive(chn_handle, byref(rcv_can_msgs), rcv_num, wait_time)
+            rcv_can_msgs = (ZCAN_Receive_Data * rcv_num)()
+            ret = self.__m_dll.ZCAN_Receive(chn_handle, rcv_can_msgs, rcv_num, wait_time)
             return rcv_can_msgs, ret
         except:
             print("Exception on ZCAN_Receive!")
@@ -276,43 +281,113 @@ class ZCAN(object):
     
     def ReceiveFD(self, chn_handle, rcv_num, wait_time = c_int(-1)):
         try:
-            rcv_canfd_msgs = ZCAN_ReceiveFD_Data() * rcv_num
-            ret = self.__m_dll.ZCAN_Receive(chn_handle, byref(rcv_can_msgs), rcv_num, wait_time)
+            rcv_canfd_msgs = (ZCAN_ReceiveFD_Data * rcv_num)()
+            ret = self.__m_dll.ZCAN_Receive(chn_handle, byref(rcv_canfd_msgs), rcv_num, wait_time)
             return rcv_canfd_msgs, ret
         except:
             print("Exception on ZCAN_ReceiveFD!")
             raise
 
-    #reserved 
     def GetIProperty(self, device_handle):
-        pass
+        try:
+            self.__m_dll.GetIProperty.restype = POINTER(IProperty)
+            return self.__m_dll.GetIProperty(device_handle)
+        except:
+            print("Exception on ZCAN_GetIProperty!")
+            raise
 
-    #reserved 
-    def ReleaseIProperty(self, property):
-        pass
+    def SetValue(self, iproperty, path, value):
+        try:
+            func = CFUNCTYPE(c_uint, c_char_p, c_char_p)(iproperty.contents.SetValue)
+            return func(c_char_p(bytes(path, "utf-8")), c_char_p(bytes(value, "utf-8")))
+        except:
+            print("Exception on IProperty SetValue")
+            raise
 
+    def GetValue(self, iproperty, path):
+        try:
+            func = CFUNCTYPE(c_char_p, c_char_p)(iproperty.contents.GetValue)
+            return func(c_char_p(bytes(path, "utf-8")))
+        except:
+            print("Exception on IProperty GetValue")
+            raise
+
+    def ReleaseIProperty(self, iproperty):
+        try:
+            return self.__m_dll.ReleaseIProperty(iproperty)
+        except:
+            print("Exception on ZCAN_ReleaseIProperty!")
+            raise
+
+def can_start(zcanlib, device_handle, chn):
+    _canfd_cfg = _ZCAN_CHANNEL_CANFD_INIT_CONFIG()
+    _canfd_cfg.abit_timing = 101166
+    _canfd_cfg.dbit_timing = 101166
+    _canfd_cfg.mode        = 0
+    _chn_cfg   = _ZCAN_CHANNEL_INIT_CONFIG()
+    _chn_cfg.canfd = _canfd_cfg
+    chn_init_cfg = ZCAN_CHANNEL_INIT_CONFIG()
+    chn_init_cfg.type = ZCAN_TYPE_CANFD
+    chn_init_cfg.config = _chn_cfg
+
+    ip = zcanlib.GetIProperty(handle)
+    zcanlib.SetValue(ip, str(chn) + "clock", "60000000")
+    zcanlib.ReleaseIProperty(ip) 
+ 
+    chn_handle = zcanlib.InitCAN(device_handle, chn, chn_init_cfg)
+    if chn_handle is None:
+        return None
+    zcanlib.StartCAN(chn_handle)
+    return chn_handle
+
+import sys
 if __name__ == "__main__":
-    can_cfg = _ZCAN_CHANNEL_CAN_INIT_CONFIG(0,1,2,3,4,5, mode = 6)
-    canfd_cfg = _ZCAN_CHANNEL_CANFD_INIT_CONFIG(0,1,2,3,4,5,6,7,8)
-    _chn_cfg = _ZCAN_CHANNEL_INIT_CONFIG(canfd = canfd_cfg)
-    chn_cfg = ZCAN_CHANNEL_INIT_CONFIG(ZCAN_TYPE_CANFD, _chn_cfg)
-    print(chn_cfg)
-    #sys.path.append(".")
-    # os.environ["PATH"] = os.getcwd() + ";" + os.environ["PATH"]
-    # print(os.environ["PATH"])
-    # zcanlib = ZCAN() 
-    # handle = zcanlib.OpenDevice(ZCAN_USBCANFD_MINI, 0,0)
-    # print(handle)
+    zcanlib = ZCAN() 
+    handle = zcanlib.OpenDevice(ZCAN_USBCANFD_MINI, 0,0)
+    print(handle)
 
-    # info = zcanlib.GetDeviceInf(handle)
-    # print(info)
+    info = zcanlib.GetDeviceInf(handle)
+    print(info)
 
-    # chn_cfg = ZCAN_CHANNEL_INIT_CONFIG(ZCAN_TYPE_CANFD)
-    # chn_handle = zcanlib.InitCAN(handle, 0, chn_cfg)
-    # if chn_handle == 0:
-    #     print("open failed")
-    # else:
-    #     zcanlib.StartCAN(chn_handle)
+    chn_handle = can_start(zcanlib, handle, 0)
+    print(chn_handle)
 
-    # zcanlib.CloseDevice(handle)
+    transmit_num = 100
+    frames = (ZCAN_CAN_FRAME * transmit_num)()
+    msgs   = (ZCAN_Transmit_Data * transmit_num)()
+    for i in range(transmit_num):
+        frames[i].can_id  = i
+        frames[i].can_dlc = 8
+        for j in range(frames[i].can_dlc):
+            frames[i].data[j] = j
+        msgs[i].frame = frames[i]
+        msgs[i].transmit_type = 2
+    ret = zcanlib.Transmit(chn_handle, msgs, transmit_num)
+    print("Tranmit Num: %d." % ret)
+
+    err_info = zcanlib.ReadChannelErrInfo(chn_handle)
+    print(err_info)
+
+    chn_status = zcanlib.ReadChannelStatus(chn_handle)    
+    print(chn_status)
+
+    while True:
+        zcanlib.ClearBuffer(chn_handle)
+        rcv_num = zcanlib.GetReceiveNum(chn_handle, ZCAN_TYPE_CAN)
+        if rcv_num:
+            print("Receive Num:%d" % rcv_num)
+            rcv_msg = (ZCAN_Receive_Data * rcv_num)()
+            rcv_msg, rcv_num = zcanlib.Receive(chn_handle, rcv_num)
+            for i in range(rcv_num):
+                print("[%d]:" %i, end='')
+                print("id:%d, dlc:%d, timestamp:%d, data:" %(rcv_msg[i].frame.can_id, rcv_msg[i].frame.can_dlc, rcv_msg[i].timestamp))
+                data = ''
+                for j in range(rcv_msg[i].frame.can_dlc):
+                    data = data + str(rcv_msg[i].frame.data[j]) + ' '
+                    # print("%d" % rcv_msg[i].frame.data[j])
+                print(data)
+        else:
+            break
+    zcanlib.ResetCAN(chn_handle)
+    zcanlib.CloseDevice(handle)
 
