@@ -266,7 +266,7 @@ class ZCAN(object):
     def Receive(self, chn_handle, rcv_num, wait_time = c_int(-1)):
         try:
             rcv_can_msgs = (ZCAN_Receive_Data * rcv_num)()
-            ret = self.__m_dll.ZCAN_Receive(chn_handle, rcv_can_msgs, rcv_num, wait_time)
+            ret = self.__m_dll.ZCAN_Receive(chn_handle, byref(rcv_can_msgs), rcv_num, wait_time)
             return rcv_can_msgs, ret
         except:
             print("Exception on ZCAN_Receive!")
@@ -327,7 +327,7 @@ def can_start(zcanlib, device_handle, chn):
     _chn_cfg   = _ZCAN_CHANNEL_INIT_CONFIG()
     _chn_cfg.canfd = _canfd_cfg
     chn_init_cfg = ZCAN_CHANNEL_INIT_CONFIG()
-    chn_init_cfg.type = ZCAN_TYPE_CANFD
+    chn_init_cfg.can_type = ZCAN_TYPE_CANFD
     chn_init_cfg.config = _chn_cfg
 
     ip = zcanlib.GetIProperty(handle)
