@@ -282,7 +282,7 @@ class ZCAN(object):
     def ReceiveFD(self, chn_handle, rcv_num, wait_time = c_int(-1)):
         try:
             rcv_canfd_msgs = (ZCAN_ReceiveFD_Data * rcv_num)()
-            ret = self.__m_dll.ZCAN_Receive(chn_handle, byref(rcv_canfd_msgs), rcv_num, wait_time)
+            ret = self.__m_dll.ZCAN_ReceiveFD(chn_handle, byref(rcv_canfd_msgs), rcv_num, wait_time)
             return rcv_canfd_msgs, ret
         except:
             print("Exception on ZCAN_ReceiveFD!")
