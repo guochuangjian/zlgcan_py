@@ -65,7 +65,7 @@ class ZCAN_DEVICE_INFO(Structure):
                 self.dr_Version / 0xFF, self.dr_Version & 0xFF,  \
                 self.in_Version / 0xFF, self.in_Version & 0xFF,  \
                 self.irq_Num, self.can_Num,  \
-                ''.join(chr(c) for c in self.str_Serial_Num, 
+                ''.join(chr(c) for c in self.str_Serial_Num), 
                 ''.join(chr(c) for c in self.str_hw_Type)
 
 
