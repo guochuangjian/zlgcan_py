@@ -17,25 +17,60 @@
 from ctypes import *
 import platform
 
-DEVICE_HANDLE  = c_void_p
-CHANNEL_HANDLE = c_void_p
-CANID          = c_uint
-ZCAN_STATUS    = c_uint
-ZCAN_DEVICE_TYPE = c_uint
+INVALID_DEVICE_HANDLE = None
+INVALID_CHANNEL_HANDLE = None
 
+ZCAN_DEVICE_TYPE  = c_uint
 
-INVALID_DEVICE_HANDLE = DEVICE_HANDLE(None)
-INVALID_CHANNEL_HANDLE = CHANNEL_HANDLE(None)
-
-ZCAN_PCI5121        = ZCAN_DEVICE_TYPE(1)
-ZCAN_PCI9810        = ZCAN_DEVICE_TYPE(2)
-ZCAN_USBCAN1        = ZCAN_DEVICE_TYPE(3)
-ZCAN_USBCAN2        = ZCAN_DEVICE_TYPE(4)
-ZCAN_PCI9820        = ZCAN_DEVICE_TYPE(5)
-
-ZCAN_USBCANFD_200U  = ZCAN_DEVICE_TYPE(41)
-ZCAN_USBCANFD_100U  = ZCAN_DEVICE_TYPE(42)
-ZCAN_USBCANFD_MINI  = ZCAN_DEVICE_TYPE(43)
+ZCAN_PCI5121         = ZCAN_DEVICE_TYPE(1)
+ZCAN_PCI9810         = ZCAN_DEVICE_TYPE(2)
+ZCAN_USBCAN1         = ZCAN_DEVICE_TYPE(3)
+ZCAN_USBCAN2         = ZCAN_DEVICE_TYPE(4)
+ZCAN_PCI9820         = ZCAN_DEVICE_TYPE(5) 
+ZCAN_CAN232          = ZCAN_DEVICE_TYPE(6)
+ZCAN_PCI5110         = ZCAN_DEVICE_TYPE(7)
+ZCAN_CANLITE         = ZCAN_DEVICE_TYPE(8)
+ZCAN_ISA9620         = ZCAN_DEVICE_TYPE(9)
+ZCAN_ISA5420         = ZCAN_DEVICE_TYPE(10)
+ZCAN_PC104CAN        = ZCAN_DEVICE_TYPE(11)
+ZCAN_CANETUDP        = ZCAN_DEVICE_TYPE(12)
+ZCAN_CANETE          = ZCAN_DEVICE_TYPE(13)
+ZCAN_DNP9810         = ZCAN_DEVICE_TYPE(14)
+ZCAN_PCI9840         = ZCAN_DEVICE_TYPE(15)
+ZCAN_PC104CAN2       = ZCAN_DEVICE_TYPE(16)
+ZCAN_PCI9820I        = ZCAN_DEVICE_TYPE(17)
+ZCAN_CANETTCP        = ZCAN_DEVICE_TYPE(18)
+ZCAN_PCIE_9220       = ZCAN_DEVICE_TYPE(19)
+ZCAN_PCI5010U        = ZCAN_DEVICE_TYPE(20)
+ZCAN_USBCAN_E_U      = ZCAN_DEVICE_TYPE(21)
+ZCAN_USBCAN_2E_U     = ZCAN_DEVICE_TYPE(22)
+ZCAN_PCI5020U        = ZCAN_DEVICE_TYPE(23)
+ZCAN_EG20T_CAN       = ZCAN_DEVICE_TYPE(24)
+ZCAN_PCIE9221        = ZCAN_DEVICE_TYPE(25)
+ZCAN_WIFICAN_TCP     = ZCAN_DEVICE_TYPE(26) 
+ZCAN_WIFICAN_UDP     = ZCAN_DEVICE_TYPE(27)
+ZCAN_PCIe9120        = ZCAN_DEVICE_TYPE(28)
+ZCAN_PCIe9110        = ZCAN_DEVICE_TYPE(29)
+ZCAN_PCIe9140        = ZCAN_DEVICE_TYPE(30)
+ZCAN_USBCAN_4E_U     = ZCAN_DEVICE_TYPE(31)
+ZCAN_CANDTU_200UR    = ZCAN_DEVICE_TYPE(32)
+ZCAN_CANDTU_MINI     = ZCAN_DEVICE_TYPE(33)
+ZCAN_USBCAN_8E_U     = ZCAN_DEVICE_TYPE(34)
+ZCAN_CANREPLAY       = ZCAN_DEVICE_TYPE(35)
+ZCAN_CANDTU_NET      = ZCAN_DEVICE_TYPE(36)
+ZCAN_CANDTU_100UR    = ZCAN_DEVICE_TYPE(37) 
+ZCAN_PCIE_CANFD_100U = ZCAN_DEVICE_TYPE(38)
+ZCAN_PCIE_CANFD_200U = ZCAN_DEVICE_TYPE(39)
+ZCAN_PCIE_CANFD_400U = ZCAN_DEVICE_TYPE(40)
+ZCAN_USBCANFD_200U   = ZCAN_DEVICE_TYPE(41)
+ZCAN_USBCANFD_100U   = ZCAN_DEVICE_TYPE(42)
+ZCAN_USBCANFD_MINI   = ZCAN_DEVICE_TYPE(43)
+ZCAN_CANFDCOM_100IE  = ZCAN_DEVICE_TYPE(44)
+ZCAN_CANSCOPE        = ZCAN_DEVICE_TYPE(45)
+ZCAN_CLOUD           = ZCAN_DEVICE_TYPE(46)
+ZCAN_CANDTU_NET_400  = ZCAN_DEVICE_TYPE(47)
+                    
+ZCAN_VIRTUAL_DEVICE  = ZCAN_DEVICE_TYPE(99) 
 
 ZCAN_STATUS_ERR         = 0
 ZCAN_STATUS_OK          = 1
@@ -65,9 +100,8 @@ class ZCAN_DEVICE_INFO(Structure):
                 self.dr_Version / 0xFF, self.dr_Version & 0xFF,  \
                 self.in_Version / 0xFF, self.in_Version & 0xFF,  \
                 self.irq_Num, self.can_Num,  \
-                ''.join(chr(c) for c in self.str_Serial_Num), 
-                ''.join(chr(c) for c in self.str_hw_Type)
-
+                ''.join(chr(c) for c in self.str_Serial_Num), \
+                ''.join(chr(c) for c in self.str_hw_Type))
 
 class _ZCAN_CHANNEL_CAN_INIT_CONFIG(Structure):
     _fields_ = [("acc_code", c_uint),
@@ -91,7 +125,7 @@ class _ZCAN_CHANNEL_CANFD_INIT_CONFIG(Structure):
 
 class _ZCAN_CHANNEL_INIT_CONFIG(Union):
     _fields_ = [("can", _ZCAN_CHANNEL_CAN_INIT_CONFIG), ("canfd", _ZCAN_CHANNEL_CANFD_INIT_CONFIG)]
-
+ 
 class ZCAN_CHANNEL_INIT_CONFIG(Structure):
     _fields_ = [("can_type", c_uint),
                 ("config", _ZCAN_CHANNEL_INIT_CONFIG)]
@@ -113,20 +147,28 @@ class ZCAN_CHANNEL_STATUS(Structure):
                 ("Reserved",     c_ubyte)]
 
 class ZCAN_CAN_FRAME(Structure):
-    _fields_ = [("can_id",  CANID), 
-                ("can_dlc", c_ubyte),
-                ("__pad",   c_ubyte),
-                ("__res0",  c_ubyte),
-                ("__res1",  c_ubyte),
-                ("data",    c_ubyte * 8)]
+    _fields_ = [("can_id",   c_uint, 29),
+                ("err_flag", c_uint, 1),
+                ("rtr_flag", c_uint, 1),
+                ("eff_flag", c_uint, 1), 
+                ("can_dlc",  c_ubyte),
+                ("__pad",    c_ubyte),
+                ("__res0",   c_ubyte),
+                ("__res1",   c_ubyte),
+                ("data",     c_ubyte * 8)]
 
-class ZCAN_CANFD_FRAME(Structure):
-    _fields_ = [("can_id",  CANID), 
-                ("len",     c_ubyte),
-                ("flags",   c_ubyte),
-                ("__res0",  c_ubyte),
-                ("__res1",  c_ubyte),
-                ("data",    c_ubyte * 64)]
+class ZCAN_CANFD_FRAME(Structure): 
+    _fields_ = [("can_id",    c_uint, 29), 
+                ("err_flag",  c_uint, 1),
+                ("rtr_flag",  c_uint, 1),
+                ("eff_flag",  c_uint, 1), 
+                ("len",       c_ubyte),
+                ("brs_flag",  c_ubyte, 1),
+                ("esi_flag",  c_ubyte, 1),
+                ("res_flags", c_ubyte, 6),
+                ("__res0",    c_ubyte),
+                ("__res1",    c_ubyte),
+                ("data",      c_ubyte * 64)]
 
 class ZCAN_Transmit_Data(Structure):
     _fields_ = [("frame", ZCAN_CAN_FRAME), ("transmit_type", c_uint)]
@@ -134,11 +176,24 @@ class ZCAN_Transmit_Data(Structure):
 class ZCAN_Receive_Data(Structure):
     _fields_  = [("frame", ZCAN_CAN_FRAME), ("timestamp", c_ulonglong)]
 
+    def __str__(self):
+        return "timestamp:%dus, can_id:0x%x, dlc:%d, eff:%d, rtr:%d, err:%d, data:%s" \
+                % (self.timestamp, self.frame.can_id, self.frame.can_dlc, 
+                self.frame.eff_flag, self.frame.rtr_flag, self.frame.err_flag, 
+                ''.join((hex(self.frame.data[i]) + ' ') for i in range(self.frame.can_dlc)))
+
 class ZCAN_TransmitFD_Data(Structure):
     _fields_ = [("frame", ZCAN_CANFD_FRAME), ("transmit_type", c_uint)]
 
 class ZCAN_ReceiveFD_Data(Structure):
     _fields_ = [("frame", ZCAN_CANFD_FRAME), ("timestamp", c_ulonglong)]
+
+    def __str__(self):
+        return "timestamp:%dus, can_id:0x%x, dlc:%d, eff:%d, rtr:%d, brs:%d, esi:%d, err:%d, data:%s" \
+                % (self.timestamp, self.frame.can_id, self.frame.len,  \
+                self.frame.eff_flag, self.frame.rtr_flag, self.frame.brs_flag, \
+                self.frame.esi_flag, self.frame.err_flag, 
+                ''.join((hex(self.frame.data[i]) + ' ') for i in range(self.frame.len)))
 
 class ZCAN_AUTO_TRANSMIT_OBJ(Structure):
     _fields_ = [("enable",   c_ushort),
@@ -315,15 +370,11 @@ class ZCAN(object):
             raise
 
 def can_start(zcanlib, device_handle, chn):
-    _canfd_cfg = _ZCAN_CHANNEL_CANFD_INIT_CONFIG()
-    _canfd_cfg.abit_timing = 101166
-    _canfd_cfg.dbit_timing = 101166
-    _canfd_cfg.mode        = 0
-    _chn_cfg   = _ZCAN_CHANNEL_INIT_CONFIG()
-    _chn_cfg.canfd = _canfd_cfg
     chn_init_cfg = ZCAN_CHANNEL_INIT_CONFIG()
     chn_init_cfg.can_type = ZCAN_TYPE_CANFD
-    chn_init_cfg.config = _chn_cfg
+    chn_init_cfg.config.canfd.abit_timing = 101166
+    chn_init_cfg.config.canfd.dbit_timing = 101166
+    chn_init_cfg.config.canfd.mode        = 0
 
     ip = zcanlib.GetIProperty(handle)
     zcanlib.SetValue(ip, str(chn) + "clock", "60000000")
@@ -335,9 +386,11 @@ def can_start(zcanlib, device_handle, chn):
     zcanlib.StartCAN(chn_handle)
     return chn_handle
 
-import sys
 if __name__ == "__main__":
-    zcanlib = ZCAN() 
+    canfd_frame = ZCAN_ReceiveFD_Data()
+    print(sizeof(canfd_frame))
+    print(canfd_frame)
+    zcanlib = ZCAN()
     handle = zcanlib.OpenDevice(ZCAN_USBCANFD_MINI, 0,0)
     print(handle)
 
@@ -348,39 +401,24 @@ if __name__ == "__main__":
     print(chn_handle)
 
     transmit_num = 100
-    frames = (ZCAN_CAN_FRAME * transmit_num)()
     msgs   = (ZCAN_Transmit_Data * transmit_num)()
     for i in range(transmit_num):
-        frames[i].can_id  = i
-        frames[i].can_dlc = 8
-        for j in range(frames[i].can_dlc):
-            frames[i].data[j] = j
-        msgs[i].frame = frames[i]
+        msgs[i].frame.can_id = i
+        msgs[i].frame.can_dlc = 8
+        for j in range(msgs[i].frame.can_dlc):
+            msgs[i].frame.data[j] = j
         msgs[i].transmit_type = 2
     ret = zcanlib.Transmit(chn_handle, msgs, transmit_num)
     print("Tranmit Num: %d." % ret)
 
-    err_info = zcanlib.ReadChannelErrInfo(chn_handle)
-    print(err_info)
-
-    chn_status = zcanlib.ReadChannelStatus(chn_handle)    
-    print(chn_status)
-
     while True:
-        zcanlib.ClearBuffer(chn_handle)
         rcv_num = zcanlib.GetReceiveNum(chn_handle, ZCAN_TYPE_CAN)
         if rcv_num:
             print("Receive Num:%d" % rcv_num)
             rcv_msg = (ZCAN_Receive_Data * rcv_num)()
             rcv_msg, rcv_num = zcanlib.Receive(chn_handle, rcv_num)
             for i in range(rcv_num):
-                print("[%d]:" %i, end='')
-                print("id:%d, dlc:%d, timestamp:%d, data:" %(rcv_msg[i].frame.can_id, rcv_msg[i].frame.can_dlc, rcv_msg[i].timestamp))
-                data = ''
-                for j in range(rcv_msg[i].frame.can_dlc):
-                    data = data + str(rcv_msg[i].frame.data[j]) + ' '
-                    # print("%d" % rcv_msg[i].frame.data[j])
-                print(data)
+                print(rcv_msg[i])
         else:
             break
     zcanlib.ResetCAN(chn_handle)
