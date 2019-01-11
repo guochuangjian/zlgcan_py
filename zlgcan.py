@@ -58,12 +58,6 @@ class ZCAN_DEVICE_INFO(Structure):
                 ("reserved", c_ushort * 4)]
 
     def __str__(self):
-        serial = ''
-        for i in range(len(self.str_Serial_Num)):
-            serial = serial + chr(self.str_Serial_Num[i])
-        hw_type = ''
-        for i in range(len(self.str_hw_Type)):
-            hw_type = hw_type + chr(self.str_hw_Type[i])
         return '硬件版本号：V%d.%02d\r\n固件版本号：V%d.%02d\r\n驱动程序版本号：V%d.%02d\r\n接口库版本号：V%d.%02d\r\n' \
                '中断号：%s\r\nCAN通道数：%s\r\n序列号：%s\r\n硬件类型：%s' % ( \
                 self.hw_Version / 0xFF, self.hw_Version & 0xFF,  \
@@ -71,7 +65,8 @@ class ZCAN_DEVICE_INFO(Structure):
                 self.dr_Version / 0xFF, self.dr_Version & 0xFF,  \
                 self.in_Version / 0xFF, self.in_Version & 0xFF,  \
                 self.irq_Num, self.can_Num,  \
-                serial, hw_type)
+                ''.join(chr(c) for c in self.str_Serial_Num, 
+                ''.join(chr(c) for c in self.str_hw_Type)
 
 
 class _ZCAN_CHANNEL_CAN_INIT_CONFIG(Structure):
