@@ -100,8 +100,14 @@ class ZCAN_DEVICE_INFO(Structure):
                 self.dr_Version / 0xFF, self.dr_Version & 0xFF,  \
                 self.in_Version / 0xFF, self.in_Version & 0xFF,  \
                 self.irq_Num, self.can_Num,  \
+<<<<<<< HEAD
                 ''.join(chr(c) for c in self.str_Serial_Num), \
                 ''.join(chr(c) for c in self.str_hw_Type))
+=======
+                ''.join(chr(c) for c in self.str_Serial_Num), 
+                ''.join(chr(c) for c in self.str_hw_Type))
+
+>>>>>>> 28fb99709c3fcf74f2ec820819d2c5118b1df3d6
 
 class _ZCAN_CHANNEL_CAN_INIT_CONFIG(Structure):
     _fields_ = [("acc_code", c_uint),
